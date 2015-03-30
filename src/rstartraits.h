@@ -1,7 +1,3 @@
-//
-// Created by alculquicondor on 3/29/15.
-//
-
 #ifndef RSTARTREE_RSTARTRAITS_H
 #define RSTARTREE_RSTARTRAITS_H
 

@@ -1,11 +1,9 @@
-//
-// Created by alculquicondor on 3/29/15.
-//
-
 #ifndef RSTARTREE_BOUNDINGBOX_H
 #define RSTARTREE_BOUNDINGBOX_H
 
 #include <stddef.h>
+#include <initializer_list>
+
 #include "rstarexception.h"
 
 template <typename Traits>

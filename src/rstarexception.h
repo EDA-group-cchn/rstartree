@@ -1,7 +1,3 @@
-//
-// Created by alculquicondor on 3/29/15.
-//
-
 #ifndef RSTARTREE_RSTAREXCEPTION_H
 #define RSTARTREE_RSTAREXCEPTION_H
 
