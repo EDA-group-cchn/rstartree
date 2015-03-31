@@ -1,5 +1,5 @@
-#ifndef RSTARTREE_RSTARTRAITS_H
-#define RSTARTREE_RSTARTRAITS_H
+#ifndef RSTARTREE_RSTARTRAITS_H_
+#define RSTARTREE_RSTARTRAITS_H_
 
 #include <stddef.h>
 #include <bits/stl_pair.h>
@@ -14,4 +14,5 @@ struct RStarTraits {
   typedef BoundingBox<RStarTraits<T, D, R, m, M>> BBType;
 };
 
-#endif //BSTAR_TREE_RSTARTRAITS_H
+#endif //RSTARTREE_RSTARTRAITS_H_
+

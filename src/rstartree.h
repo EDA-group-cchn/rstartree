@@ -1,5 +1,5 @@
-#ifndef RSTARTREE_RSTARTREE_H
-#define RSTARTREE_RSTARTREE_H
+#ifndef RSTARTREE_RSTARTREE_H_
+#define RSTARTREE_RSTARTREE_H_
 
 #include <vector>
 #include "rstartraits.h"
@@ -22,4 +22,4 @@ class RStarTree {
   };
 };
 
-#endif //RSTARTREE_RSTARTREE_H
+#endif //RSTARTREE_RSTARTREE_H_

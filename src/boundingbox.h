@@ -1,5 +1,5 @@
-#ifndef RSTARTREE_BOUNDINGBOX_H
-#define RSTARTREE_BOUNDINGBOX_H
+#ifndef RSTARTREE_BOUNDINGBOX_H_
+#define RSTARTREE_BOUNDINGBOX_H_
 
 #include <stddef.h>
 #include <initializer_list>
@@ -47,5 +47,6 @@ BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval
     intervals_[i] = interval;
 }
 
-#endif //BSTAR_TREE_BOUNDINGBOX_H
+#endif //RSTARTREE_BOUNDINGBOX_H_
+
 

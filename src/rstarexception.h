@@ -1,5 +1,5 @@
-#ifndef RSTARTREE_RSTAREXCEPTION_H
-#define RSTARTREE_RSTAREXCEPTION_H
+#ifndef RSTARTREE_RSTAREXCEPTION_H_
+#define RSTARTREE_RSTAREXCEPTION_H_
 
 #include <exception>
 #include <string>
@@ -14,4 +14,4 @@ class RStarException : public std::exception {
   }
 };
 
-#endif //RSTARTREE_RSTAREXCEPTION_H
+#endif //RSTARTREE_RSTAREXCEPTION_H_
