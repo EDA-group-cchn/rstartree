@@ -9,7 +9,7 @@
 template <typename Traits>
 class BoundingBox {
     typedef typename Traits::CoordType CoordType;
-    static const size_t dimensions = Traits::dimensions;
+    static const size_t dimensions_ = Traits::dimensions_;
     typedef typename Traits::Interval Interval;
 public:
     BoundingBox(std::initializer_list<Interval> intervals);
@@ -35,13 +35,13 @@ public:
     }
 
 private:
-    Interval intervals_[dimensions];
+    Interval intervals_[dimensions_];
 };
 
 template <typename T>
 BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval> intervals) {
     size_t i = 0;
-    if (intervals.size() != dimensions)
+    if (intervals.size() != dimensions_)
         throw RStarException("Dimensions mismatch");
     for (const Interval &interval : intervals)
         intervals_[i] = interval;
