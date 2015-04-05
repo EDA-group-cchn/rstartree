@@ -6,6 +6,6 @@ using namespace std;
 
 int main() {
   RStarTree<> rtree;
-  RStarTree<>::BoundingBox bb{{1, 2}, {2, 3}, {4, 5}};
+  RStarTree<>::BoundingBox bb{{1, 2}, {2, 3}};
   return 0;
 }
