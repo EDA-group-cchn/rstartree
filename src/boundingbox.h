@@ -63,7 +63,6 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea()
     BoundingBox<T>::CoordType res = 1;
     if (area_ != -1)
         return this->area_ = res;
-    size_t i = 0;
     for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_){
         res *= std::get<1>(interval) - std::get<0>(interval);
     }
