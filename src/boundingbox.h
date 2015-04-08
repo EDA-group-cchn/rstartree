@@ -51,7 +51,7 @@ class BoundingBox {
 
 template <typename T>
 BoundingBox<T>::BoundingBox(
-    std::initializer_list<typename BoundingBox::Interval> intervals) {
+    std::initializer_list<Interval> intervals) {
   size_t i = 0;
   if (intervals.size() != dimensions_)
     throw RStarException("Dimensions mismatch");

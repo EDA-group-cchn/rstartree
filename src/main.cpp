@@ -17,6 +17,8 @@ void testing() {
   assert(bb1 % bb2);
   assert(bb1 % bb3);
   assert(not (bb2 % bb3));
+
+  assert(rtree.Intersect(bb1).size() == 0);
 }
 
 int main() {

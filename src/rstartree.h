@@ -6,7 +6,7 @@
 
 #include "rstartraits.h"
 
-template<typename Traits=RStarTraits<double, 2, size_t>>
+template <typename Traits=RStarTraits<double, 2, size_t>>
 class RStarTree {
  public:
   typedef typename Traits::BBType BoundingBox;
@@ -39,6 +39,10 @@ class RStarTree {
   void Delete(const BoundingBox &bounding_box, RecordType record);
 
  private:
+  /* Search subroutines */
+  void Search(const BoundingBox &bounding_box, Node *node,
+      bool (BoundingBox::*criteria)(const BoundingBox &) const);
+
   /* Insert subroutines */
   void Insert(const Entry &entry, size_t level);
   Node *&ChooseSubtree(const BoundingBox &bounding_box, size_t level);
@@ -53,6 +57,32 @@ class RStarTree {
   Node *root_;
   size_t min_node_size_, max_node_size_;
   std::set<size_t> overflown_levels;
+  std::vector<RecordType> results_buffer_;
 };
 
+template <typename T>
+std::vector<typename RStarTree<T>::RecordType> RStarTree<T>::Intersect(
+    BoundingBox const &bounding_box) {
+  results_buffer_.clear();
+  Search(bounding_box, root_, &BoundingBox::Intersects);
+  return results_buffer_;
+}
+
+template <typename T>
+void RStarTree<T>::Search(BoundingBox const &bounding_box, Node *node,
+    bool (BoundingBox::*criteria)(const BoundingBox &) const) {
+  if (node->level_ == 0) {
+    for (Entry &entry : node->children_) {
+      if ((bounding_box.*criteria)(entry.first))
+        results_buffer_.push_back(*static_cast<RecordType *>(entry.second));
+    }
+  } else {
+    for (Entry &entry : node->children_) {
+      if (bounding_box % entry.first)
+        Search(bounding_box, static_cast<Node *>(entry.second), criteria);
+    }
+  }
+}
+
 #endif //RSTARTREE_RSTARTREE_H_
+
