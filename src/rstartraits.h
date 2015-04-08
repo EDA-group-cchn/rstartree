@@ -1,17 +1,17 @@
 #ifndef RSTARTREE_RSTARTRAITS_H_
 #define RSTARTREE_RSTARTRAITS_H_
 
-#include <stddef.h>
-#include <bits/stl_pair.h>
+#include <utility>
+
 #include "boundingbox.h"
 
-template<typename T, size_t D, typename R, size_t m, size_t M>
+template<typename T=double, size_t D=2, typename R=size_t>
 struct RStarTraits {
   typedef T CoordType;
-  static const size_t dimensions_ = D, min_size_ = m, max_size_ = M;
+  static const size_t dimensions_ = D;
   typedef std::pair<T, T> Interval;
   typedef R RecordType;
-  typedef BoundingBox<RStarTraits<T, D, R, m, M>> BBType;
+  typedef BoundingBox<RStarTraits<T, D, R>> BBType;
 };
 
 #endif //RSTARTREE_RSTARTRAITS_H_

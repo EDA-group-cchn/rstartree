@@ -1,10 +1,8 @@
 #ifndef RSTARTREE_BOUNDINGBOX_H_
 #define RSTARTREE_BOUNDINGBOX_H_
 
-#include <stddef.h>
 #include <initializer_list>
 #include <utility>
-
 
 #include "rstarexception.h"
 
@@ -63,7 +61,7 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
   if (area_ != -1)
     return this->area_ = res;
   for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_) {
-    res *= std::get<1>(interval) - std::get<0>(interval);
+    res *= interval.second - interval.first;
   }
   return this->area_ = res;
 }
