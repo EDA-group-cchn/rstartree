@@ -18,6 +18,10 @@ void testing() {
   assert(bb1 % bb3);
   assert(not (bb2 % bb3));
 
+  assert(bb1.Intersect(bb2) == 0);
+  assert(bb1.Intersect(bb3) == 1);
+  assert(bb2.Intersect(bb3) == 0);
+
   assert(rtree.Intersect(bb1).size() == 0);
 }
 
