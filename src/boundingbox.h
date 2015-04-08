@@ -39,6 +39,11 @@ class BoundingBox {
 
   CoordType HyperArea();
 
+  bool Intersects(const BoundingBox<Traits> &bounding_box) const;
+  bool operator%(const BoundingBox<Traits> &bounding_box) const {
+    return Intersects(bounding_box);
+  }
+
  private:
   Interval intervals_[dimensions_];
   CoordType area_;
@@ -67,6 +72,16 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
     res *= interval.second - interval.first;
   }
   return this->area_ = res;
+}
+
+template <typename T>
+bool BoundingBox<T>::Intersects(BoundingBox<T> const &bounding_box) const {
+  for (size_t i = 0; i < dimensions_; ++i) {
+    if (this->intervals_[i].first > bounding_box.intervals_[i].second or
+        this->intervals_[i].second < bounding_box.intervals_[i].first)
+      return false;
+  }
+  return true;
 }
 
 #endif //RSTARTREE_BOUNDINGBOX_H_

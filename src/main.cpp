@@ -1,12 +1,25 @@
 #include <iostream>
+#include <cassert>
 
 #include "rstartree.h"
 
 using namespace std;
 
-int main() {
+void testing() {
   RStarTree<> rtree;
-  RStarTree<>::BoundingBox bb{{1, 3}, {2, 4}};
-  bb.HyperArea();
+  RStarTree<>::BoundingBox bb1{{1, 3}, {2, 5}}, bb2{{1, 4}, {1, 2}},
+      bb3{{2, 3}, {3, 4}};
+
+  assert(bb1.HyperArea() == 6);
+  assert(bb2.HyperArea() == 3);
+  assert(bb3.HyperArea() == 1);
+
+  assert(bb1 % bb2);
+  assert(bb1 % bb3);
+  assert(not (bb2 % bb3));
+}
+
+int main() {
+  testing();
   return 0;
 }
