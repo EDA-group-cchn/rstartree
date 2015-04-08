@@ -28,6 +28,7 @@ class BoundingBox {
 
   void SetInterval(size_t dimension, Interval interval) {
     intervals_[dimension] = interval;
+    area_ = -1;
   }
   void SetIntervalStart(size_t dimension, CoordType coord) {
     intervals_[dimension].first = coord;
@@ -57,6 +58,8 @@ BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval
 template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea()
 {
+    if (area_ != -1)
+        return this->area_ = res;
     size_t i = 0;
     BoundingBox<T>::CoordType res = 1;
     for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_){
