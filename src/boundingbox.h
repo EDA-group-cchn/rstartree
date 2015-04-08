@@ -39,6 +39,7 @@ class BoundingBox {
 
  private:
   Interval intervals_[dimensions_];
+  CoordType area_;
 };
 
 template <typename T>
@@ -51,19 +52,17 @@ BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval
         intervals_[i] = interval;
         ++i;
     }
+    area_ = -1;
 }
 
 template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() const
 {
-    //if (BoundingBox<T>::Intervals.size() == 0)
-    //    throw RStarException("No dimensions found");
     size_t i = 0;
     BoundingBox<T>::CoordType res = 1;
     for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_)
     {
-        res *= ( std::get<1>(GetInterval(i)) ) - ( std::get<0>(GetInterval(i)) );
-        //std::cout << std::get<0>(GetInterval(i)) << std::endl;
+        res *= std::get<1>(GetInterval(i)) - std::get<0>(GetInterval(i));
         ++i;
     }
     //std::cout << res << std::endl;
