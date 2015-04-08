@@ -37,7 +37,13 @@ class BoundingBox {
   }
 
   CoordType HyperArea();
+
   CoordType Intersect(const BoundingBox<Traits> &bb);
+
+  bool Intersects(const BoundingBox<Traits> &bounding_box) const;
+  bool operator%(const BoundingBox<Traits> &bounding_box) const {
+    return Intersects(bounding_box);
+  }
 
  private:
   Interval intervals_[dimensions_];
@@ -46,7 +52,7 @@ class BoundingBox {
 
 template <typename T>
 BoundingBox<T>::BoundingBox(
-    std::initializer_list<typename BoundingBox::Interval> intervals) {
+    std::initializer_list<Interval> intervals) {
   size_t i = 0;
   if (intervals.size() != dimensions_)
     throw RStarException("Dimensions mismatch");
@@ -69,7 +75,6 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
   return this->area_ = res;
 }
 
-
 template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>::Intersect(const BoundingBox<T> &bb) {
   BoundingBox<T>::CoordType res = 1;
@@ -77,6 +82,16 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::Intersect(const BoundingBox<T
     res *=  std::max(static_cast<CoordType>(0) , std::min(this->intervals_[i].second,bb.intervals_[i].second) -  std::max(this->intervals_[i].first , bb.intervals_[i].first));
   }
   return res;
+}
+
+template <typename T>
+bool BoundingBox<T>::Intersects(BoundingBox<T> const &bounding_box) const {
+  for (size_t i = 0; i < dimensions_; ++i) {
+    if (this->intervals_[i].first > bounding_box.intervals_[i].second or
+        this->intervals_[i].second < bounding_box.intervals_[i].first)
+      return false;
+  }
+  return true;
 }
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
