@@ -63,7 +63,6 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea()
         res *= std::get<1>(interval) - std::get<0>(interval);
         ++i;
     }
-    //std::cout << res << std::endl;
     return this->area_ = res;
 
 }
