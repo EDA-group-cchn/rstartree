@@ -36,6 +36,7 @@ class BoundingBox {
     intervals_[dimension].second = coord;
     area_ = -1;
   }
+
   CoordType HyperArea();
 
  private:
@@ -44,7 +45,8 @@ class BoundingBox {
 };
 
 template <typename T>
-BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval> intervals) {
+BoundingBox<T>::BoundingBox(
+    std::initializer_list<typename BoundingBox::Interval> intervals) {
   size_t i = 0;
   if (intervals.size() != dimensions_)
     throw RStarException("Dimensions mismatch");
@@ -60,12 +62,12 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
   BoundingBox<T>::CoordType res = 1;
   if (area_ != -1)
     return this->area_ = res;
-  for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_) {
+  for (const typename BoundingBox<T>::Interval &interval :
+      BoundingBox<T>::intervals_) {
     res *= interval.second - interval.first;
   }
   return this->area_ = res;
 }
-
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
 
