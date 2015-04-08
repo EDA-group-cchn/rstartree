@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <utility>
 #include <cmath>
+#include <vector>
 
 #include "rstarexception.h"
 
@@ -39,6 +40,7 @@ class BoundingBox {
   }
 
   CoordType HyperArea();
+  CoordType Intersect(const BoundingBox<Traits> &bb);
 
  private:
   Interval intervals_[dimensions_];
@@ -63,11 +65,20 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
   BoundingBox<T>::CoordType res = 1;
   if (area_ != -1)
     return this->area_ = res;
-  for (const typename BoundingBox<T>::Interval &interval :
-      BoundingBox<T>::intervals_) {
+  for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_) {
     res *= std::abs(interval.second) - std::abs(interval.first);
   }
   return this->area_ = res;
+}
+
+
+template <typename T>
+typename BoundingBox<T>::CoordType BoundingBox<T>::Intersect(const BoundingBox<T> &bb) {
+  BoundingBox<T>::CoordType res = 1;
+  for (size_t i = 0; i < T::dimensions_; ++i) {
+    res *=  fmax(0 , fmin(this->intervals_[i].second,bb.intervals_[i].second) -  fmax(this->intervals_[i].first , bb.intervals_[i].first));
+  }
+  return res;
 }
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
