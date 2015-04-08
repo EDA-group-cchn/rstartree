@@ -3,6 +3,7 @@
 
 #include <initializer_list>
 #include <utility>
+#include <cmath>
 
 #include "rstarexception.h"
 
@@ -64,7 +65,7 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
     return this->area_ = res;
   for (const typename BoundingBox<T>::Interval &interval :
       BoundingBox<T>::intervals_) {
-    res *= interval.second - interval.first;
+    res *= std::abs(interval.second) - std::abs(interval.first);
   }
   return this->area_ = res;
 }
