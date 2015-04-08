@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 #include <initializer_list>
+#include <utility>      // std::pair, std::get
+
 
 #include "rstarexception.h"
 
@@ -33,6 +35,7 @@ class BoundingBox {
   void SetIntervalEnd(size_t dimension, CoordType coord) {
     intervals_[dimension].second = coord;
   }
+  CoordType HyperArea() const;
 
  private:
   Interval intervals_[dimensions_];
@@ -44,8 +47,30 @@ BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval
   if (intervals.size() != dimensions_)
     throw RStarException("Dimensions mismatch");
   for (const Interval &interval : intervals)
-    intervals_[i] = interval;
+    {
+        intervals_[i] = interval;
+        ++i;
+    }
 }
+
+template <typename T>
+typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() const
+{
+    //if (BoundingBox<T>::Intervals.size() == 0)
+    //    throw RStarException("No dimensions found");
+    size_t i = 0;
+    BoundingBox<T>::CoordType res = 1;
+    for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_)
+    {
+        res *= ( std::get<1>(GetInterval(i)) ) - ( std::get<0>(GetInterval(i)) );
+        //std::cout << std::get<0>(GetInterval(i)) << std::endl;
+        ++i;
+    }
+    //std::cout << res << std::endl;
+    return res;
+
+}
+
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
 

@@ -6,6 +6,7 @@ using namespace std;
 
 int main() {
   RStarTree<> rtree;
-  RStarTree<>::BoundingBox bb{{1, 2}, {2, 3}};
+  RStarTree<>::BoundingBox bb{{1, 3}, {2, 4}};
+  bb.HyperArea();
   return 0;
 }
