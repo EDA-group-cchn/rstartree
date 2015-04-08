@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <initializer_list>
-#include <utility>      // std::pair, std::get
+#include <utility>
 
 
 #include "rstarexception.h"
@@ -49,25 +49,23 @@ template <typename T>
 BoundingBox<T>::BoundingBox(std::initializer_list<typename BoundingBox::Interval> intervals) {
   size_t i = 0;
   if (intervals.size() != dimensions_)
-      throw RStarException("Dimensions mismatch");
-  for (const Interval &interval : intervals){
-      intervals_[i] = interval;
-      ++i;
+    throw RStarException("Dimensions mismatch");
+  for (const Interval &interval : intervals) {
+    intervals_[i] = interval;
+    ++i;
   }
   area_ = -1;
 }
 
 template <typename T>
-typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea()
-{
+typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
   BoundingBox<T>::CoordType res = 1;
   if (area_ != -1)
-      return this->area_ = res;
-  for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_){
-      res *= std::get<1>(interval) - std::get<0>(interval);
+    return this->area_ = res;
+  for (const typename BoundingBox<T>::Interval &interval : BoundingBox<T>::intervals_) {
+    res *= std::get<1>(interval) - std::get<0>(interval);
   }
   return this->area_ = res;
-
 }
 
 
