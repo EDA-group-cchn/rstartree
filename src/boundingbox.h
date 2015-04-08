@@ -38,7 +38,7 @@ class BoundingBox {
 
   CoordType HyperArea();
 
-  CoordType Intersect(const BoundingBox<Traits> &bb);
+  CoordType Overlap(const BoundingBox<Traits> &bb);
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
   bool operator%(const BoundingBox<Traits> &bounding_box) const {
@@ -76,10 +76,13 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::HyperArea() {
 }
 
 template <typename T>
-typename BoundingBox<T>::CoordType BoundingBox<T>::Intersect(const BoundingBox<T> &bb) {
+typename BoundingBox<T>::CoordType BoundingBox<T>::Overlap(
+    const BoundingBox<T> &bb) {
   BoundingBox<T>::CoordType res = 1;
   for (size_t i = 0; i < T::dimensions_; ++i) {
-    res *=  std::max(static_cast<CoordType>(0) , std::min(this->intervals_[i].second,bb.intervals_[i].second) -  std::max(this->intervals_[i].first , bb.intervals_[i].first));
+    res *= std::max(static_cast<CoordType>(0),
+        std::min(this->intervals_[i].second,bb.intervals_[i].second) -
+        std::max(this->intervals_[i].first , bb.intervals_[i].first));
   }
   return res;
 }
