@@ -32,9 +32,11 @@ class BoundingBox {
   }
   void SetIntervalStart(size_t dimension, CoordType coord) {
     intervals_[dimension].first = coord;
+    area_ = -1;
   }
   void SetIntervalEnd(size_t dimension, CoordType coord) {
     intervals_[dimension].second = coord;
+    area_ = -1;
   }
   CoordType HyperArea();
 
