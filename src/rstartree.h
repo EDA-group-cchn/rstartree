@@ -51,7 +51,8 @@ class RStarTree {
   void ReInsert(Node *node);
 
   /* Delete subroutines */
-  Node *FindLeaf(const BoundingBox &bounding_box, RecordType record);
+  Node *FindLeaf(const BoundingBox &bounding_box, const RecordType &record,
+                 Node *node);
   void CondenseTree(Node *node);
 
   Node *root_;
@@ -60,6 +61,7 @@ class RStarTree {
   std::vector<RecordType> results_buffer_;
 };
 
+/* Search */
 template <typename T>
 std::vector<typename RStarTree<T>::RecordType> RStarTree<T>::Intersect(
     BoundingBox const &bounding_box) {
@@ -81,6 +83,29 @@ void RStarTree<T>::Search(BoundingBox const &bounding_box, Node *node,
       if (bounding_box % entry.first)
         Search(bounding_box, static_cast<Node *>(entry.second), criteria);
     }
+  }
+}
+
+/* Deletion */
+template <typename T>
+typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
+    const BoundingBox &bounding_box, const RecordType &record, Node *node) {
+  if (node->level_ == 0) {
+    for (Entry &entry : node->children_) {
+      if (bounding_box == entry.first and
+          record == *static_cast<RecordType *>(entry.second))
+        return node;
+    }
+    return nullptr;
+  } else {
+    Node *res;
+    for (Entry &entry : node->children_)
+      if (bounding_box % entry.first) {
+        res = FindLeaf(bounding_box, record, static_cast<Node *>(entry.second));
+        if (res != nullptr)
+          return res;
+      }
+    return nullptr;
   }
 }
 
