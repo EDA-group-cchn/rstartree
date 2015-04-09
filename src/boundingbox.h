@@ -132,7 +132,7 @@ template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
   BoundingBox<T>::CoordType res = 0;
   for (std::size_t i = 0; i < dimensions_; ++i)
-    res += (double)(intervals_[i].second - intervals_[i].first);
+    res += (intervals_[i].second - intervals_[i].first;
   return res;
 }
 
