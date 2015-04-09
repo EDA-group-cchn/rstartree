@@ -41,6 +41,7 @@ class BoundingBox {
   CoordType Enlargement(const BoundingBox<Traits> &bb);
   CoordType Overlap(const BoundingBox<Traits> &bb);
   CoordType Margin();
+  
   BoundingBox Extend(BoundingBox<Traits> &bb);
   BoundingBox operator + (BoundingBox<Traits> &bb);
   BoundingBox & operator += (BoundingBox<Traits> &bb);
