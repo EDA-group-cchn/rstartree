@@ -97,8 +97,9 @@ void RStarTree<T>::Search(BoundingBox const &bounding_box, Node *node,
 template <typename T>
 typename RStarTree<T>::BoundingBox RStarTree<T>::BuildBoundingBox(
     typename VEntry::iterator begin, typename VEntry::iterator end) {
-  BoundingBox res;
-  for (auto it = begin; it != end; ++it)
+  typename VEntry::iterator it = begin;
+  BoundingBox res = *it;
+  for (++it; it != end; ++it)
     res += it->first;
   return res;
 }
