@@ -22,6 +22,10 @@ void testing() {
   assert(bb1.Overlap(bb3) == 1);
   assert(bb2.Overlap(bb3) == 0);
 
+  rtree.Insert(bb1, 1);
+  rtree.Insert(bb2, 2);
+  rtree.Insert(bb3, 3);
+
   assert(rtree.Intersect(bb1).size() == 0);
 }
 

@@ -51,7 +51,7 @@ class RStarTree {
   BoundingBox BuildBoundingBox(typename VEntry::iterator begin,
                                typename VEntry::iterator end);
   typename VEntry::iterator FindEntry(VEntry &entries, Node *node);
-  void Insert(const Entry &entry, size_t level);
+  void InsertEntry(const Entry &entry, size_t level);
   Node *&ChooseSubtree(const BoundingBox &bounding_box, size_t level);
   bool OverflowTreatment(Node *node);
   std::pair<Node *, Node *> Split(Node *node);
@@ -94,6 +94,17 @@ void RStarTree<T>::Search(BoundingBox const &bounding_box, Node *node,
 }
 
 /* Insertion */
+template <typename T>
+void RStarTree<T>::Insert(const BoundingBox &bounding_box,
+                          RecordType record) {
+  Entry entry{bounding_box, static_cast<void *>(new RecordType(record))};
+  InsertEntry(entry, 0);
+}
+
+template <typename T>
+void RStarTree<T>::InsertEntry(const Entry &entry, size_t level) {
+}
+
 template <typename T>
 typename RStarTree<T>::BoundingBox RStarTree<T>::BuildBoundingBox(
     typename VEntry::iterator begin, typename VEntry::iterator end) {
