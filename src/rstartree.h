@@ -52,6 +52,7 @@ class RStarTree {
                                typename VEntry::iterator end);
   void Insert(const Entry &entry, size_t level);
   Node *&ChooseSubtree(const BoundingBox &bounding_box, size_t level);
+  typename VEntry::iterator FindEntry(VEntry &entries, Node *node);
   bool OverflowTreatment(Node *node);
   std::pair<Node *, Node *> Split(Node *node);
   void ReInsert(Node *node);
@@ -63,7 +64,7 @@ class RStarTree {
 
   Node *root_;
   size_t min_node_size_, max_node_size_;
-  std::set<size_t> overflown_levels;
+  std::set<size_t> overflown_levels_;
   std::vector<RecordType> results_buffer_;
 };
 
@@ -176,6 +177,63 @@ std::pair<typename RStarTree<T>::Node *, typename RStarTree<T>::Node *>
   res.second->children_.assign(mid_it, children.end());
   delete node;
   return res;
+}
+
+template <typename T>
+typename RStarTree<T>::VEntry::iterator
+    RStarTree<T>::FindEntry(VEntry &entries, Node *node) {
+  typename VEntry::iterator it;
+  for (it = entries.begin(); it != entries.end(); ++it) {
+    if (static_cast<Node *>(it->second) == node)
+      break;
+  }
+  return it;
+}
+
+template <typename T>
+bool RStarTree<T>::OverflowTreatment(Node *node) {
+  if (node != root_ and
+      overflown_levels_.find(node->level_) != overflown_levels_.end()) {
+    overflown_levels_.insert(node->level_);
+    ReInsert(node);
+    return false;
+  } else {
+    Node *&parent = node->parent_;
+    if (!parent) {
+      parent = new Node(node->level_ + 1);
+      root_ = parent;
+    } else {
+      parent->children_.erase(FindEntry(parent->children_, node));
+    }
+    auto split = Split(node);
+    parent->children_.push_back(
+        {BuildBoundingBox(split.first->children_.begin(),
+                          split.first->children_.end()),
+         split.first});
+    parent->children_.push_back(
+        {BuildBoundingBox(split.second->children_.begin(),
+                          split.second->children_.end()),
+         split.second});
+    return true;
+  }
+}
+
+template <typename T>
+void RStarTree<T>::ReInsert(Node *node) {
+  VEntry &children = node->children_;
+  BoundingBox full_bb = BuildBoundingBox(children.begin(), children.end());
+  std::sort(children.begin(), children.end(),
+            [&full_bb] (const Entry &a, const Entry &b) {
+      return full_bb.distance(a.first) < full_bb.distance(b.first);
+  });
+  size_t p = static_cast<size_t>(0.3 * max_node_size_);
+  VEntry tmp(children.end()-p, children.end());
+  children.erase(children.end()-p, children.end());
+  FindEntry(node->parent_->children_, node)->first =
+      BuildBoundingBox(children.begin(), children.end());
+  for (Entry &entry : tmp) {
+    Insert(entry, node->level_);
+  }
 }
 
 /* Deletion */
