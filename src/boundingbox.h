@@ -43,7 +43,7 @@ class BoundingBox {
   CoordType Margin();
   BoundingBox Extend(BoundingBox<Traits> &bb);
   BoundingBox operator + (BoundingBox<Traits> &bb);
-  BoundingBox operator += (BoundingBox<Traits> &bb);
+  BoundingBox & operator += (BoundingBox<Traits> &bb);
 
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
@@ -155,7 +155,7 @@ BoundingBox<T> BoundingBox<T>::operator + (BoundingBox<T> &bb)
   return Extend(bb);
 }
 template<typename T>
-BoundingBox<T> BoundingBox<T>::operator += (BoundingBox<T> &bb)
+BoundingBox<T>& BoundingBox<T>::operator += (BoundingBox<T> &bb)
 {
  
   for (size_t i = 0; i < T::dimensions_; ++i) {
@@ -163,6 +163,6 @@ BoundingBox<T> BoundingBox<T>::operator += (BoundingBox<T> &bb)
     this->intervals_[i].second = std::max(this->intervals_[i].second, bb.intervals_[i].second);
   }
   this->area_ = -1;
-  return this;
+  return *this;
 }
 #endif //RSTARTREE_BOUNDINGBOX_H_
