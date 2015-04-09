@@ -61,6 +61,7 @@ class BoundingBox {
 
 template <typename T>
 BoundingBox<T>::BoundingBox() {
+  area_ = -1;
 }
 template <typename T>
 BoundingBox<T>::BoundingBox(
