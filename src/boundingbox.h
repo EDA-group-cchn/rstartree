@@ -43,6 +43,7 @@ class BoundingBox {
   CoordType Margin();
   BoundingBox Extend(BoundingBox<Traits> &bb);
   BoundingBox operator + (BoundingBox<Traits> &bb);
+  BoundingBox operator += (BoundingBox<Traits> &bb);
 
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
@@ -130,13 +131,13 @@ bool BoundingBox<T>::Equal(BoundingBox<T> const &bounding_box) const {
   return true;
 }
 
-/*template <typename T>
+template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
   BoundingBox<T>::CoordType res = 0;
   for (std::size_t i = 0; i < dimensions_; ++i)
-    res += (intervals_[i].second - intervals_[i].first;
+    res += (intervals_[i].second - intervals_[i].first);
   return res;
-}*/
+}
 template<typename T>
 BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb)
 {
@@ -145,14 +146,23 @@ BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb)
     tmp.intervals_[i].first = std::min(this->intervals_[i].first, bb.intervals_[i].first);
     tmp.intervals_[i].second = std::max(this->intervals_[i].second, bb.intervals_[i].second);
   }
-  tmp.area_ = Enlargement(tmp);
+  tmp.area_ = -1;
   return tmp;
 }
-/*template<typename T>
+template<typename T>
 BoundingBox<T> BoundingBox<T>::operator + (BoundingBox<T> &bb)
 {
-  BoundingBox tmp;
-
-
-}*/
+  return Extend(bb);
+}
+template<typename T>
+BoundingBox<T> BoundingBox<T>::operator += (BoundingBox<T> &bb)
+{
+ 
+  for (size_t i = 0; i < T::dimensions_; ++i) {
+    this->intervals_[i].first = std::min(this->intervals_[i].first, bb.intervals_[i].first);
+    this->intervals_[i].second = std::max(this->intervals_[i].second, bb.intervals_[i].second);
+  }
+  this->area_ = -1;
+  return this;
+}
 #endif //RSTARTREE_BOUNDINGBOX_H_
