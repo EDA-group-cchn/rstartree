@@ -224,7 +224,7 @@ void RStarTree<T>::ReInsert(Node *node) {
   BoundingBox full_bb = BuildBoundingBox(children.begin(), children.end());
   std::sort(children.begin(), children.end(),
             [&full_bb] (const Entry &a, const Entry &b) {
-      return full_bb.distance(a.first) < full_bb.distance(b.first);
+      return full_bb.CenterDistance(a.first) < full_bb.CenterDistance(b.first);
   });
   size_t p = static_cast<size_t>(0.3 * max_node_size_);
   VEntry tmp(children.end()-p, children.end());
