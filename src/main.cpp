@@ -33,7 +33,6 @@ void testing() {
   assert(r1.GetIntervalEnd(0) == r3.GetIntervalEnd(0));
   assert(r1.GetIntervalEnd(1) == r3.GetIntervalEnd(1));
 
-  //assert(s.GetInterval(2))
   assert(bb1.HyperArea() == 6);
   assert(bb2.HyperArea() == 3);
   assert(bb3.HyperArea() == 1);
