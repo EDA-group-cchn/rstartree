@@ -139,12 +139,11 @@ typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
 
 template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>:: CenterDistance (const BoundingBox<T>& bb){
-  BoundingBox<T>::CoordType distance = 0, t;
+BoundingBox<T>::CoordType distance = 0 , t ;
   for (std::size_t i = 0; i < dimensions_; ++i) {
-    t = (this->intervals_[i].first + this->intervals_[i].second +
-        bb.intervals_[i].first + bb.intervals_[i].second)
-        /2.0;
-    distance += t*t;
+    t = (this->intervals_[i].first + this->intervals_[i].second) / 2.0 -
+        (bb.intervals_[i].first + bb.intervals_[i].second) /2.0;
+    distance += t*t ;
   }
   return distance;
 }
