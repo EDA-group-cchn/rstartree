@@ -41,6 +41,7 @@ class BoundingBox {
   CoordType Enlargement(const BoundingBox<Traits> &bb);
   CoordType Overlap(const BoundingBox<Traits> &bb);
   CoordType Margin();
+  CoordType CenterDistance (const BoundingBox<Traits>& bb);
 
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
@@ -132,8 +133,19 @@ template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
   BoundingBox<T>::CoordType res = 0;
   for (std::size_t i = 0; i < dimensions_; ++i)
-    res += (intervals_[i].second - intervals_[i].first;
+    res += (intervals_[i].second - intervals_[i].first);
   return res;
+}
+
+template <typename T>
+typename BoundingBox<T>::CoordType BoundingBox<T>:: CenterDistance (const BoundingBox<T>& bb){
+BoundingBox<T>::CoordType distance = 0 , t ;
+  for (std::size_t i = 0; i < dimensions_; ++i) {
+    t = (this->intervals_[i].first + this->intervals_[i].second) / 2.0 -
+        (bb.intervals_[i].first + bb.intervals_[i].second) /2.0;
+    distance += t*t ;
+  }
+  return distance;
 }
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
