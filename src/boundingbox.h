@@ -45,6 +45,9 @@ class BoundingBox {
   BoundingBox operator + (BoundingBox<Traits> &bb);
   BoundingBox & operator += (BoundingBox<Traits> &bb);
 
+  CoordType CenterDistance (const BoundingBox<Traits>& bb);
+
+
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
   bool operator%(const BoundingBox<Traits> &bounding_box) const {
@@ -63,6 +66,7 @@ class BoundingBox {
 
 template <typename T>
 BoundingBox<T>::BoundingBox() {
+  area_ = -1;
 }
 template <typename T>
 BoundingBox<T>::BoundingBox(
@@ -138,11 +142,12 @@ typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
     res += (intervals_[i].second - intervals_[i].first);
   return res;
 }
+
 template<typename T>
 BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb)
 {
   BoundingBox tmp;
-  for (size_t i = 0; i < T::dimensions_; ++i) {
+  for (size_t i = 0; i < dimensions_; ++i) {
     tmp.intervals_[i].first = std::min(this->intervals_[i].first, bb.intervals_[i].first);
     tmp.intervals_[i].second = std::max(this->intervals_[i].second, bb.intervals_[i].second);
   }
@@ -158,11 +163,25 @@ template<typename T>
 BoundingBox<T>& BoundingBox<T>::operator += (BoundingBox<T> &bb)
 {
  
-  for (size_t i = 0; i < T::dimensions_; ++i) {
+  for (size_t i = 0; i < dimensions_; ++i) {
     this->intervals_[i].first = std::min(this->intervals_[i].first, bb.intervals_[i].first);
     this->intervals_[i].second = std::max(this->intervals_[i].second, bb.intervals_[i].second);
   }
   this->area_ = -1;
   return *this;
 }
+
+
+template <typename T>
+typename BoundingBox<T>::CoordType BoundingBox<T>:: CenterDistance (const BoundingBox<T>& bb){
+BoundingBox<T>::CoordType distance = 0 , t ;
+  for (std::size_t i = 0; i < dimensions_; ++i) {
+    t = (this->intervals_[i].first + this->intervals_[i].second) / 2.0 -
+        (bb.intervals_[i].first + bb.intervals_[i].second) /2.0;
+    distance += t*t ;
+  }
+  return distance;
+}
+
+
 #endif //RSTARTREE_BOUNDINGBOX_H_
