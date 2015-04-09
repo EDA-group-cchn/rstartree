@@ -47,6 +47,8 @@ class BoundingBox {
     return Intersects(bounding_box);
   }
 
+  double sum_() const;
+
   bool Equal(const BoundingBox<Traits> &bounding_box) const;
   bool operator==(const BoundingBox<Traits> &bounding_box) const {
     return Equal(bounding_box);
@@ -127,6 +129,15 @@ bool BoundingBox<T>::Equal(BoundingBox<T> const &bounding_box) const {
   return true;
 }
 
-#endif //RSTARTREE_BOUNDINGBOX_H_
+template <typename T>
+double BoundingBox<T>:: sum_() const
+	{
+		double per = 0;
+		for (std::size_t i = 0; i < dimensions_; ++i)
+			per += (double)(intervals_[i].second - intervals_[i].first);
 
+		return per;
+	}
+
+#endif //RSTARTREE_BOUNDINGBOX_H_
 
