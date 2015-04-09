@@ -40,14 +40,13 @@ class BoundingBox {
   CoordType HyperArea();
   CoordType Enlargement(const BoundingBox<Traits> &bb);
   CoordType Overlap(const BoundingBox<Traits> &bb);
+  CoordType Margin();
 
 
   bool Intersects(const BoundingBox<Traits> &bounding_box) const;
   bool operator%(const BoundingBox<Traits> &bounding_box) const {
     return Intersects(bounding_box);
   }
-
-  double Margin() const;
 
   bool Equal(const BoundingBox<Traits> &bounding_box) const;
   bool operator==(const BoundingBox<Traits> &bounding_box) const {
@@ -130,11 +129,11 @@ bool BoundingBox<T>::Equal(BoundingBox<T> const &bounding_box) const {
 }
 
 template <typename T>
-double BoundingBox<T>:: Margin() const {
-  double per = 0;
+typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
+  BoundingBox<T>::CoordType res = 0;
   for (std::size_t i = 0; i < dimensions_; ++i)
-    per += (double)(intervals_[i].second - intervals_[i].first);
-  return per;
+    res += (double)(intervals_[i].second - intervals_[i].first);
+  return res;
 }
 
 #endif //RSTARTREE_BOUNDINGBOX_H_
