@@ -32,7 +32,7 @@ class RStarTree {
 
  public:
   RStarTree(size_t min_node_size=20, size_t max_node_size=50) :
-      root_(new Node), min_node_size_(min_node_size_),
+      root_(new Node), min_node_size_(min_node_size),
       max_node_size_(max_node_size) {
   }
 
@@ -48,8 +48,9 @@ class RStarTree {
       bool (BoundingBox::*criteria)(const BoundingBox &) const);
 
   /* Insert subroutines */
-  BoundingBox BuildBoundingBox(typename VEntry::iterator begin,
-                               typename VEntry::iterator end);
+  BoundingBox BuildBoundingBox(typename VEntry::const_iterator begin,
+                               typename VEntry::const_iterator end);
+  BoundingBox BuildBoundingBox(const VEntry &entries);
   typename VEntry::iterator FindEntry(VEntry &entries, Node *node);
   void InsertEntry(const Entry &entry, size_t level);
   CoordType Overlap(const BoundingBox &bb, const VEntry &entries);
@@ -97,12 +98,29 @@ void RStarTree<T>::Search(BoundingBox const &bounding_box, Node *node,
 template <typename T>
 void RStarTree<T>::Insert(const BoundingBox &bounding_box,
                           RecordType record) {
+  overflown_levels_.clear();
   Entry entry{bounding_box, static_cast<void *>(new RecordType(record))};
   InsertEntry(entry, 0);
 }
 
 template <typename T>
 void RStarTree<T>::InsertEntry(const Entry &entry, size_t level) {
+  Node *node = ChooseSubtree(entry.first, level);
+  bool split = false;
+  node->children_.push_back(entry);
+  if (node->children_.size() > max_node_size_) {
+    split = OverflowTreatment(node);
+  }
+  Node *parent = node->parent_;
+  while (parent != root_) {
+    typename VEntry::iterator it = FindEntry(parent->children_, node);
+    it->first = BuildBoundingBox(node->children_);
+    node = parent;
+    parent = node->parent_;
+    if (split) {
+      OverflowTreatment(node);
+    }
+  }
 }
 
 template <typename T>
@@ -137,7 +155,7 @@ typename RStarTree<T>::Node *RStarTree<T>::ChooseSubtree(
     } else {  // least area enlargement
       cmp_best = it->first.Enlargement(bb) - it->first.HyperArea();
       for (++it; it != node->children_.end(); ++it) {
-        cmp_value = it->first.Enlargement - it->first.HyperArea();
+        cmp_value = it->first.Enlargement(bb) - it->first.HyperArea();
         if (cmp_value < cmp_best) {
           best_child = static_cast<Node *>(it->second);
           cmp_best = cmp_value;
@@ -151,12 +169,19 @@ typename RStarTree<T>::Node *RStarTree<T>::ChooseSubtree(
 
 template <typename T>
 typename RStarTree<T>::BoundingBox RStarTree<T>::BuildBoundingBox(
-    typename VEntry::iterator begin, typename VEntry::iterator end) {
-  typename VEntry::iterator it = begin;
-  BoundingBox res = *it;
+    typename VEntry::const_iterator begin,
+    typename VEntry::const_iterator end) {
+  typename VEntry::const_iterator it = begin;
+  BoundingBox res = it->first;
   for (++it; it != end; ++it)
     res += it->first;
   return res;
+}
+
+template <typename T>
+typename RStarTree<T>::BoundingBox RStarTree<T>::BuildBoundingBox(
+    const VEntry &entries) {
+  return BuildBoundingBox(entries.begin(), entries.end());
 }
 
 template <typename T>
@@ -173,13 +198,13 @@ RStarTree<T>::FindEntry(VEntry &entries, Node *node) {
 template <typename T>
 bool RStarTree<T>::OverflowTreatment(Node *node) {
   if (node != root_ and
-      overflown_levels_.find(node->level_) != overflown_levels_.end()) {
+      overflown_levels_.find(node->level_) == overflown_levels_.end()) {
     overflown_levels_.insert(node->level_);
     ReInsert(node);
     return false;
   } else {
     Node *&parent = node->parent_;
-    if (!parent) {
+    if (parent == nullptr) {
       // We have to add a new level
       parent = new Node(node->level_ + 1);
       root_ = parent;
@@ -204,7 +229,7 @@ std::pair<typename RStarTree<T>::Node *, typename RStarTree<T>::Node *>
     RStarTree<T>::Split(Node *node) {
   using namespace std::placeholders;
   auto order = [] (const Entry &a, const Entry &b, size_t d,
-                   CoordType (BoundingBox::*getter)(size_t)) {
+                   CoordType (BoundingBox::*getter)(size_t) const) {
       return (a.first.*getter)(d) < (b.first.*getter)(d);
   };
   /* Choosing axis */
@@ -246,7 +271,7 @@ std::pair<typename RStarTree<T>::Node *, typename RStarTree<T>::Node *>
         BoundingBox bb1 = BuildBoundingBox(children.begin(), mid_it),
             bb2 = BuildBoundingBox(mid_it, children.end());
         s = bb1.Overlap(bb2);
-        a = bb1.Area() + bb2.Area();
+        a = bb1.HyperArea() + bb2.HyperArea();
         if (s < best_s or (s == best_s and a < best_a)) {
           best_s = s;
           best_a = a;
@@ -289,7 +314,7 @@ void RStarTree<T>::ReInsert(Node *node) {
   FindEntry(node->parent_->children_, node)->first =
       BuildBoundingBox(children.begin(), children.end());
   for (Entry &entry : tmp) {
-    Insert(entry, node->level_);
+    InsertEntry(entry, node->level_);
   }
 }
 

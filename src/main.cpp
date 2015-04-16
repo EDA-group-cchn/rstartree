@@ -5,8 +5,8 @@
 
 using namespace std;
 
-void testing() {
-  RStarTree<> rtree;
+void TestingBoundingBox() {
+  RStarTree<> rtree(2, 5);
   RStarTree<>::BoundingBox bb1{{1, 3}, {2, 5}}, bb2{{1, 4}, {1, 2}},
       bb3{{2, 3}, {3, 4}};
   
@@ -49,11 +49,16 @@ void testing() {
   rtree.Insert(bb2, 2);
   rtree.Insert(bb3, 3);
 
-  assert(rtree.Intersect(bb1).size() == 0);
+  rtree.Insert({{5, 6}, {5, 6}}, 4);
+  rtree.Insert({{8, 9}, {8, 9}}, 5);
+  rtree.Insert({{12, 13}, {12, 13}}, 6);
+  //rtree.Insert({{15, 16}, {15, 16}}, 7);
 
+  assert(rtree.Intersect(bb1).size() == 3);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 6);
 }
 
 int main() {
-  testing();
+  TestingBoundingBox();
   return 0;
 }
