@@ -52,14 +52,14 @@ class RStarTree {
                                typename VEntry::iterator end);
   typename VEntry::iterator FindEntry(VEntry &entries, Node *node);
   void InsertEntry(const Entry &entry, size_t level);
-  Node *&ChooseSubtree(const BoundingBox &bounding_box, size_t level);
+  CoordType Overlap(const BoundingBox &bb, const VEntry &entries);
+  Node *ChooseSubtree(const BoundingBox &bb, size_t level);
   bool OverflowTreatment(Node *node);
   std::pair<Node *, Node *> Split(Node *node);
   void ReInsert(Node *node);
 
   /* Delete subroutines */
-  Node *FindLeaf(const BoundingBox &bounding_box, const RecordType &record,
-                 Node *node);
+  Node *FindLeaf(const BoundingBox &bb, const RecordType &record, Node *node);
   void CondenseTree(Node *node);
 
   Node *root_;
@@ -103,6 +103,50 @@ void RStarTree<T>::Insert(const BoundingBox &bounding_box,
 
 template <typename T>
 void RStarTree<T>::InsertEntry(const Entry &entry, size_t level) {
+}
+
+template <typename T>
+typename RStarTree<T>::CoordType RStarTree<T>::Overlap(BoundingBox const &bb,
+                             RStarTree::VEntry const &entries) {
+  CoordType result = 0;
+  for (const Entry &e : entries)
+    result += e.first.Overlap(bb);
+  return result;
+}
+
+template <typename T>
+typename RStarTree<T>::Node *RStarTree<T>::ChooseSubtree(
+    const BoundingBox &bb, size_t level) {
+  Node *node = root_, *best_child;
+  VEntry::iterator it;
+  CoordType cmp_best, cmp_value;
+  while (node->level_ != level) {
+    it = node->children_.begin();
+    best_child = static_cast<Node *>(it->second);
+    if (node->level_ == 1) {  // least overlap enlargement
+      cmp_best = Overlap(bb + it->first, node->children_) -
+          Overlap(it->first, node->children_);
+      for (++it; it != node->children_.end(); ++it) {
+        cmp_value = Overlap(bb + it->first, node->children_) -
+                    Overlap(it->first, node->children_);
+        if (cmp_value < cmp_best) {
+          best_child = static_cast<Node *>(it->second);
+          cmp_best = cmp_value;
+        }
+      }
+    } else {  // least area enlargement
+      cmp_best = it->first.Enlargement(bb) - it->first.HyperArea();
+      for (++it; it != node->children_.end(); ++it) {
+        cmp_value = it->first.Enlargement - it->first.HyperArea();
+        if (cmp_value < cmp_best) {
+          best_child = static_cast<Node *>(it->second);
+          cmp_best = cmp_value;
+        }
+      }
+    }
+    node = best_child;
+  }
+  return node;
 }
 
 template <typename T>
@@ -251,10 +295,10 @@ void RStarTree<T>::ReInsert(Node *node) {
 /* Deletion */
 template <typename T>
 typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
-    const BoundingBox &bounding_box, const RecordType &record, Node *node) {
+    const BoundingBox &bb, const RecordType &record, Node *node) {
   if (node->level_ == 0) {
     for (Entry &entry : node->children_) {
-      if (bounding_box == entry.first and
+      if (bb == entry.first and
           record == *static_cast<RecordType *>(entry.second))
         return node;
     }
@@ -262,8 +306,8 @@ typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
   } else {
     Node *res;
     for (Entry &entry : node->children_)
-      if (bounding_box % entry.first) {
-        res = FindLeaf(bounding_box, record, static_cast<Node *>(entry.second));
+      if (bb % entry.first) {
+        res = FindLeaf(bb, record, static_cast<Node *>(entry.second));
         if (res != nullptr)
           return res;
       }
