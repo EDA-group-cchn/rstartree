@@ -105,20 +105,24 @@ void RStarTree<T>::Insert(const BoundingBox &bounding_box,
 
 template <typename T>
 void RStarTree<T>::InsertEntry(const Entry &entry, size_t level) {
-  Node *node = ChooseSubtree(entry.first, level);
+  Node *node = ChooseSubtree(entry.first, level),
+      *parent = node->parent_;
   bool split = false;
   node->children_.push_back(entry);
   if (node->children_.size() > max_node_size_) {
     split = OverflowTreatment(node);
   }
-  Node *parent = node->parent_;
-  while (parent != root_) {
-    typename VEntry::iterator it = FindEntry(parent->children_, node);
-    it->first = BuildBoundingBox(node->children_);
-    node = parent;
-    parent = node->parent_;
-    if (split) {
-      OverflowTreatment(node);
+  while (parent) {
+    if (split and parent->children_.size() > max_node_size_) {
+      node = parent;
+      parent = node->parent_;
+      split = OverflowTreatment(node);
+    } else {
+      split = false;
+      typename VEntry::iterator it = FindEntry(parent->children_, node);
+      it->first = BuildBoundingBox(node->children_);
+      node = parent;
+      parent = node->parent_;
     }
   }
 }

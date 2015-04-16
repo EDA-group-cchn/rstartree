@@ -52,10 +52,10 @@ void TestingBoundingBox() {
   rtree.Insert({{5, 6}, {5, 6}}, 4);
   rtree.Insert({{8, 9}, {8, 9}}, 5);
   rtree.Insert({{12, 13}, {12, 13}}, 6);
-  //rtree.Insert({{15, 16}, {15, 16}}, 7);
+  rtree.Insert({{15, 16}, {15, 16}}, 7);
 
   assert(rtree.Intersect(bb1).size() == 3);
-  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 6);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 7);
 }
 
 int main() {
