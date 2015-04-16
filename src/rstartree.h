@@ -118,7 +118,7 @@ template <typename T>
 typename RStarTree<T>::Node *RStarTree<T>::ChooseSubtree(
     const BoundingBox &bb, size_t level) {
   Node *node = root_, *best_child;
-  VEntry::iterator it;
+  typename VEntry::iterator it;
   CoordType cmp_best, cmp_value;
   while (node->level_ != level) {
     it = node->children_.begin();
