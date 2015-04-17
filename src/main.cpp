@@ -6,17 +6,13 @@
 
 using namespace std;
 
-inline int GetRandom() {
-  return rand() % 100;
-}
-
 typename RStarTree<>::BoundingBox GetRandomBB() {
-  double a = GetRandom(), b = GetRandom();
-  return {{a, a + GetRandom()}, {b, b + GetRandom()}};
+  double a = rand() % 10000, b = rand() % 10000;
+  return {{a, a + rand() % 5}, {b, b + rand() % 5}};
 }
 
 void Testing() {
-  RStarTree<> rtree(2, 5);
+  RStarTree<> rtree(4, 10);
   RStarTree<>::BoundingBox bb1{{1, 3}, {2, 5}}, bb2{{1, 4}, {1, 2}},
       bb3{{2, 3}, {3, 4}};
   
@@ -66,8 +62,11 @@ void Testing() {
 
   assert(rtree.Intersect(bb1).size() == 3);
   assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 7);
-  for (size_t i = 0; i < 10; ++i)
-    rtree.Insert(GetRandomBB(), 8 + i);
+  for (size_t i = 0; i < 4000; ++i) {
+    RStarTree<>::BoundingBox bb = GetRandomBB();
+    rtree.Insert(bb, 8 + i);
+    assert(rtree.Intersect(bb).size() != 0);
+  }
 }
 
 int main() {
