@@ -24,9 +24,15 @@ class RStarTree {
   struct Node {
     VEntry children_;
     size_t level_;
-    Node *parent_;
+    Node *parent_, *replacement_;
     Node(size_t level=0, Node *parent=nullptr) :
-        level_(level), parent_(parent) {
+        level_(level), parent_(parent), replacement_(nullptr) {
+    }
+    Node *GetReplacement() {
+      Node *node = this;
+      while (node->replacement_)
+        node = node->replacement_;
+      return node;
     }
   };
 
@@ -66,6 +72,7 @@ class RStarTree {
   Node *root_;
   size_t min_node_size_, max_node_size_;
   std::set<size_t> overflown_levels_;
+  std::set<Node *> nodes_to_delete_;
   std::vector<RecordType> results_buffer_;
 };
 
@@ -75,6 +82,9 @@ std::vector<typename RStarTree<T>::RecordType> RStarTree<T>::Intersect(
     BoundingBox const &bounding_box) {
   results_buffer_.clear();
   Search(bounding_box, root_, &BoundingBox::Intersects);
+  for (Node *node : nodes_to_delete_)
+    delete node;
+  nodes_to_delete_.clear();
   return results_buffer_;
 }
 
@@ -105,25 +115,29 @@ void RStarTree<T>::Insert(const BoundingBox &bounding_box,
 
 template <typename T>
 void RStarTree<T>::InsertEntry(const Entry &entry, size_t level) {
-  Node *node = ChooseSubtree(entry.first, level),
-      *parent = node->parent_;
-  bool split = false;
+  Node *node = ChooseSubtree(entry.first, level), *parent;
   node->children_.push_back(entry);
+  if (level != 0)
+    static_cast<Node *>(entry.second)->parent_ = node;
   if (node->children_.size() > max_node_size_) {
-    split = OverflowTreatment(node);
-  }
-  while (parent) {
-    if (split and parent->children_.size() > max_node_size_) {
-      node = parent;
+    bool split = OverflowTreatment(node);
+    node = node->GetReplacement();
+    while (split and node != root_) {
       parent = node->parent_;
-      split = OverflowTreatment(node);
-    } else {
-      split = false;
-      typename VEntry::iterator it = FindEntry(parent->children_, node);
-      it->first = BuildBoundingBox(node->children_);
+      if (parent->children_.size() > max_node_size_) {
+        split = OverflowTreatment(parent);
+        parent = parent->GetReplacement();
+      } else {
+        split = false;
+      }
       node = parent;
-      parent = node->parent_;
     }
+  }
+  while (node != root_) {
+    parent = node->parent_;
+    typename VEntry::iterator it = FindEntry(parent->children_, node);
+    it->first = BuildBoundingBox(node->children_);
+    node = parent;
   }
 }
 
@@ -300,7 +314,14 @@ std::pair<typename RStarTree<T>::Node *, typename RStarTree<T>::Node *>
   auto mid_it = children.begin() + best_partition;
   res.first->children_.assign(children.begin(), mid_it);
   res.second->children_.assign(mid_it, children.end());
-  delete node;
+  if (node->level_ != 0) {
+    for (Entry &e : res.first->children_)
+      static_cast<Node *>(e.second)->parent_ = res.first;
+    for (Entry &e : res.second->children_)
+      static_cast<Node *>(e.second)->parent_ = res.second;
+  }
+  node->replacement_ = res.first;
+  nodes_to_delete_.insert(node);
   return res;
 }
 
@@ -315,11 +336,15 @@ void RStarTree<T>::ReInsert(Node *node) {
   size_t p = static_cast<size_t>(0.3 * max_node_size_);
   VEntry tmp(children.end()-p, children.end());
   children.erase(children.end()-p, children.end());
-  FindEntry(node->parent_->children_, node)->first =
-      BuildBoundingBox(children.begin(), children.end());
-  for (Entry &entry : tmp) {
-    InsertEntry(entry, node->level_);
+  size_t level = node->level_;
+  Node *parent;
+  while (node != root_) {
+    parent = node->parent_;
+    FindEntry(parent->children_, node)->first = BuildBoundingBox(children);
+    node = parent;
   }
+  for (Entry &entry : tmp)
+    InsertEntry(entry, level);
 }
 
 /* Deletion */
