@@ -39,12 +39,12 @@ class BoundingBox {
 
   CoordType HyperArea();
   CoordType Enlargement(const BoundingBox<Traits> &bb);
-  CoordType Overlap(const BoundingBox<Traits> &bb);
+  CoordType Overlap(const BoundingBox<Traits> &bb) const;
   CoordType Margin();
   
-  BoundingBox Extend(BoundingBox<Traits> &bb);
-  BoundingBox operator + (BoundingBox<Traits> &bb);
-  BoundingBox & operator += (BoundingBox<Traits> &bb);
+  BoundingBox Extend(BoundingBox<Traits> &bb) const;
+  BoundingBox operator + (BoundingBox<Traits> &bb) const;
+  BoundingBox & operator += (const BoundingBox<Traits> &bb);
 
   CoordType CenterDistance (const BoundingBox<Traits>& bb);
 
@@ -107,7 +107,7 @@ typename BoundingBox<T>::CoordType BoundingBox<T>::Enlargement(
 
 template <typename T>
 typename BoundingBox<T>::CoordType BoundingBox<T>::Overlap(
-    const BoundingBox<T> &bb) {
+    const BoundingBox<T> &bb) const {
   BoundingBox<T>::CoordType res = 1;
   for (size_t i = 0; i < T::dimensions_; ++i) {
     res *= std::max(static_cast<CoordType>(0),
@@ -145,7 +145,7 @@ typename BoundingBox<T>::CoordType BoundingBox<T>:: Margin(){
 }
 
 template<typename T>
-BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb)
+BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb) const
 {
   BoundingBox tmp;
   for (size_t i = 0; i < dimensions_; ++i) {
@@ -156,12 +156,12 @@ BoundingBox<T> BoundingBox<T>::Extend(BoundingBox<T> &bb)
   return tmp;
 }
 template<typename T>
-BoundingBox<T> BoundingBox<T>::operator + (BoundingBox<T> &bb)
+BoundingBox<T> BoundingBox<T>::operator + (BoundingBox<T> &bb) const
 {
   return Extend(bb);
 }
 template<typename T>
-BoundingBox<T>& BoundingBox<T>::operator += (BoundingBox<T> &bb)
+BoundingBox<T>& BoundingBox<T>::operator += (const BoundingBox<T> &bb)
 {
  
   for (size_t i = 0; i < dimensions_; ++i) {

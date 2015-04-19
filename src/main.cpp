@@ -1,12 +1,18 @@
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
 
 #include "rstartree.h"
 
 using namespace std;
 
-void testing() {
-  RStarTree<> rtree;
+typename RStarTree<>::BoundingBox GetRandomBB() {
+  double a = rand() % 10000, b = rand() % 10000;
+  return {{a, a + rand() % 5}, {b, b + rand() % 5}};
+}
+
+void Testing() {
+  RStarTree<> rtree(4, 10);
   RStarTree<>::BoundingBox bb1{{1, 3}, {2, 5}}, bb2{{1, 4}, {1, 2}},
       bb3{{2, 3}, {3, 4}};
   
@@ -45,11 +51,25 @@ void testing() {
   assert(bb1.Overlap(bb3) == 1);
   assert(bb2.Overlap(bb3) == 0);
 
-  assert(rtree.Intersect(bb1).size() == 0);
+  rtree.Insert(bb1, 1);
+  rtree.Insert(bb2, 2);
+  rtree.Insert(bb3, 3);
 
+  rtree.Insert({{5, 6}, {5, 6}}, 4);
+  rtree.Insert({{8, 9}, {8, 9}}, 5);
+  rtree.Insert({{12, 13}, {12, 13}}, 6);
+  rtree.Insert({{15, 16}, {15, 16}}, 7);
+
+  assert(rtree.Intersect(bb1).size() == 3);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 7);
+  for (size_t i = 0; i < 4000; ++i) {
+    RStarTree<>::BoundingBox bb = GetRandomBB();
+    rtree.Insert(bb, 8 + i);
+    assert(rtree.Intersect(bb).size() != 0);
+  }
 }
 
 int main() {
-  testing();
+  Testing();
   return 0;
 }
