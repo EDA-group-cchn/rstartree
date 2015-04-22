@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include <functional>
+#include <queue>          
 
 #include "rstartraits.h"
 
@@ -260,5 +261,44 @@ typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
     return nullptr;
   }
 }
+template<typename T>
+void RStarTree<T>::CondenseTree(Node *node)
+{
+  Node *tmp = node,parent;
+  std::queue<Entry> q;
+  Entry en;
+  if (node->level_ != 0)
+  {
+    parent = node->parent_;
+    typename VEntry::iterator it = FindEntry(parent->children_,node);
+    en = *it;
+    if(node->children_.size()<min_node_size_)
+    {
+      parent->children_.erase(en);
+      for(Entry &entry : node->children_)
+        en.push(entry);
+    }
+    parent = node;
+    CondenseTree(parent);
+  }
+  
+
+
+
+}
+template<typename T>
+void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
+{
+  Node *tmp;
+  tmp = FindLeaf(bounding_box,record,root_);
+  for (typename VEntry::iterator it = tmp->chidren_.begin(); it!=tmp->children_.end(); ++it)
+  {
+      if (bounding_box == it->first and
+          record == *static_cast<RecordType *>(it->second))
+        tmp->children_.erase(*it);
+  }
+  CondenseTree(tmp);
+}
+
 
 #endif //RSTARTREE_RSTARTREE_H_
