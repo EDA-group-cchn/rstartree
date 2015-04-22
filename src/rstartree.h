@@ -267,23 +267,27 @@ void RStarTree<T>::CondenseTree(Node *node)
   Node *tmp = node,parent;
   std::queue<Entry> q;
   Entry en;
-  if (node->level_ != 0)
-  {
-    parent = node->parent_;
+  if (tmp->level_ != 0){
+    parent = tmp->parent_;
     typename VEntry::iterator it = FindEntry(parent->children_,node);
     en = *it;
-    if(node->children_.size()<min_node_size_)
-    {
+    if(tmp->children_.size()<min_node_size_){
       parent->children_.erase(en);
-      for(Entry &entry : node->children_)
+      for(Entry &entry : tmp->children_)
         en.push(entry);
     }
-    parent = node;
-    CondenseTree(parent);
+    else{
+      while(tmp != root_){
+        BuildBoundingBox(tmp->children_);
+        tmp = parent;
+      }
+    }
   }
-  
-
-
+  tmp = parent;
+  CondenseTree(tmp);
+  /*while(!en.empty()){
+    insert(en.front());
+  }*/
 
 }
 template<typename T>
