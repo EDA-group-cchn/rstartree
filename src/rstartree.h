@@ -370,7 +370,7 @@ typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
     return nullptr;
   }
 }
-/*template<typename T>
+template<typename T>
 void RStarTree<T>::CondenseTree(Node *node)
 {
   Node *tmp,*parent;
@@ -398,8 +398,8 @@ void RStarTree<T>::CondenseTree(Node *node)
     q.pop();
   }/**/
 
-//}
-/*template<typename T>
+}
+template<typename T>
 void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
 {
   Node *tmp;
@@ -419,7 +419,7 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
     root_ = static_cast<Node*>(tmp->children_[0].second);
     delete(tmp);
   }
-}/**/
+}
 
 
 #endif //RSTARTREE_RSTARTREE_H_
