@@ -270,23 +270,23 @@ void RStarTree<T>::CondenseTree(Node *node)
   Entry en;
   while(tmp != root_){
     parent = tmp->parent_;
-    if(tmp->children_.size()<min_node_size_){
+    if(tmp->children_.size()<min_node_size_)
+    {
       typename VEntry::iterator it = FindEntry(parent->children_,node);
-      parent->children_.erase(*it);
+      parent->children_.erase(it);
       for(Entry &entry : tmp->children_)
         q.push(entry);
     }
-    else{
-      while(tmp != root_){
-        BuildBoundingBox(tmp->children_);
-        tmp = parent;
-      }
+    else
+    {
+        typename VEntry::iterator it = FindEntry(parent->children_, node);
+  //      it->first = BuildBoundingBox(tmp->children_);
     }
+    tmp = parent;
   }
-  tmp = parent;
-  CondenseTree(tmp);
   /*while(!q.empty()){
-    insertEntry(en.front(),0);
+    insertEntry(q.front(),0);
+    q.pop();
   }*/
 
 }
@@ -297,17 +297,18 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
   tmp = FindLeaf(bounding_box,record,root_);
   if(!tmp)
   {
-    for (typename VEntry::iterator it = tmp->chidren_.begin(); it!=tmp->children_.end(); ++it)
+    for (typename VEntry::iterator it = tmp->children_.begin(); it!=tmp->children_.end(); ++it)
     {
       if (bounding_box == it->first and
           record == *static_cast<RecordType *>(it->second))
-        tmp->children_.erase(*it);
+        tmp->children_.erase(it);
     }
     CondenseTree(tmp);
   }
-  if(tmp->children_.size==1)
+  if(tmp->children_.size()==1)
   {
-    root_ = tmp->children_;
+    root_ = static_cast<Node*>(tmp->children_[0].second);
+    delete(tmp);
   }
 }
 
