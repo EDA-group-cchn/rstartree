@@ -20,7 +20,7 @@ void Testing() {
   RStarTree<>::BoundingBox r1{{1,4},{1,5}}, r2{{1,4},{1,4}}, r3{{1,4},{1,5}};
   s1 = bb1+bb2;
   s2 = bb2+bb3;
-  cout<<bb1.GetInterval(0).first<<endl;
+  
   // test sum for s1
   assert(s1.GetIntervalStart(0) == r1.GetIntervalStart(0));
   assert(s1.GetIntervalStart(1) == r1.GetIntervalStart(1));
@@ -61,11 +61,12 @@ void Testing() {
   rtree.Insert({{15, 16}, {15, 16}}, 7);
 
 
-  rtree.Delete(bb1,0);
-
-
   assert(rtree.Intersect(bb1).size() == 3);
   assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 7);
+  rtree.Delete(bb1,1);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 6);
+  rtree.Delete(bb3,3);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 5);
   for (size_t i = 0; i < 4000; ++i) {
     RStarTree<>::BoundingBox bb = GetRandomBB();
     rtree.Insert(bb, 8 + i);

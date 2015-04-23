@@ -375,26 +375,30 @@ void RStarTree<T>::CondenseTree(Node *node)
 {
   Node *tmp,*parent;
   tmp = node;
-  std::queue<Entry> q;
-  Entry en;
-  while(tmp != root_){
+  std::queue<Node*> q;
+ 
+  while(tmp != root_)
+  {
     parent = tmp->parent_;
     if(tmp->children_.size()<min_node_size_)
     {
-      typename VEntry::iterator it = FindEntry(parent->children_,node);
+      typename VEntry::iterator it = FindEntry(parent->children_,tmp);
       parent->children_.erase(it);
-      for(Entry &entry : tmp->children_)
-        q.push(entry);
+      q.push(tmp);
     }
     else
     {
-        typename VEntry::iterator it = FindEntry(parent->children_, node);
-  //      it->first = BuildBoundingBox(tmp->children_);
+        typename VEntry::iterator it = FindEntry(parent->children_, tmp);
+        it->first = BuildBoundingBox(tmp->children_);
     }
     tmp = parent;
   }
-  /*while(!q.empty()){
-    insertEntry(q.front(),0);
+  while(!q.empty())
+  {
+    for (typename VEntry::iterator it = q.front()->children_.begin(); it!=q.front()->children_.end(); ++it)
+    {
+      InsertEntry(*it,0);
+    }
     q.pop();
   }/**/
 
@@ -404,7 +408,7 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
 {
   Node *tmp;
   tmp = FindLeaf(bounding_box,record,root_);
-  if(!tmp)
+  if(tmp)
   {
     for (typename VEntry::iterator it = tmp->children_.begin(); it!=tmp->children_.end(); ++it)
     {
