@@ -16,8 +16,24 @@ void error(const char *msg)
 
 void run(int socket);
 
+void test() {
+  char buffer[256];
+  Command command;
+  while (true) {
+    printf("> ");
+    fflush(stdout);
+    fgets(buffer, 255, stdin);
+    command = Command::Parse(std::string(buffer));
+    puts(command.String().c_str());
+    if (command.OpCode() == 3)
+      break;
+  }
+  exit(0);
+}
+
 int main(int argc, char *argv[])
 {
+  test();
   int sockfd, portno, n;
   struct sockaddr_in serv_addr;
   struct hostent *server;
@@ -56,10 +72,8 @@ void run(int sockfd) {
     fflush(stdout);
     bzero(buffer, 256);
     fgets(buffer, 255, stdin);
-    Command command = Command::Parse(std::string(buffer, 255));
+    Command command = Command::Parse(std::string(buffer));
     if (command.OpCode() != -1) {
-      if (command.OpCode() == 3)
-        break;
       const char *msg = command.String().c_str();
       n = write(sockfd, msg, strlen(msg));
       if (n < 0)
@@ -69,6 +83,9 @@ void run(int sockfd) {
       if (n < 0)
         error("ERROR reading from socket");
       puts(buffer);
+      if (command.OpCode() == 3) {
+        break;
+      }
     } else {
       puts("Invalid command");
     }
