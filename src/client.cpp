@@ -5,8 +5,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <map>
-#include <sstream>
+
+#include "command.h"
 
 void error(const char *msg)
 {
@@ -47,43 +47,20 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-struct Command {
-  int op_code;
-  double x1, x2, y1, y2;
-  size_t value;
-  static std::map<std::string, int> operations;
-  static Command parse(const std::string s) {
-    Command ans;
-    ans.op_code = -1;
-    return ans;
-  }
-  std::string toString() {
-    std::stringstream ss;
-    ss << op_code << x1 << x2 << y1 << y2 << value;
-    return ss.str();
-  }
-};
-
-std::map<std::string, int> Command::operations = {
-    {"SELECT", 0},
-    {"INSERT", 1},
-    {"DELETE", 2},
-    {"EXIT", 3}
-};
-
 void run(int sockfd) {
   char buffer[256];
   int n;
   std::map<std::string, int>::iterator it;
   while (true) {
     printf("> ");
+    fflush(stdout);
     bzero(buffer, 256);
     fgets(buffer, 255, stdin);
-    Command command = Command::parse(std::string(buffer, 255));
-    if (command.op_code != -1) {
-      if (command.op_code == 3)
+    Command command = Command::Parse(std::string(buffer, 255));
+    if (command.OpCode() != -1) {
+      if (command.OpCode() == 3)
         break;
-      const char *msg = command.toString().c_str();
+      const char *msg = command.String().c_str();
       n = write(sockfd, msg, strlen(msg));
       if (n < 0)
         error("ERROR writing to socket");
