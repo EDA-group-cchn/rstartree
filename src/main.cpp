@@ -14,7 +14,7 @@ void testing() {
   RStarTree<>::BoundingBox r1{{1,4},{1,5}}, r2{{1,4},{1,4}}, r3{{1,4},{1,5}};
   s1 = bb1+bb2;
   s2 = bb2+bb3;
-  
+  cout<<bb1.GetInterval(0).first<<endl;
   // test sum for s1
   assert(s1.GetIntervalStart(0) == r1.GetIntervalStart(0));
   assert(s1.GetIntervalStart(1) == r1.GetIntervalStart(1));
@@ -46,6 +46,8 @@ void testing() {
   assert(bb2.Overlap(bb3) == 0);
 
   assert(rtree.Intersect(bb1).size() == 0);
+
+  rtree.Delete(bb1,0);
 
 }
 
