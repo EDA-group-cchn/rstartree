@@ -397,10 +397,10 @@ void RStarTree<T>::CondenseTree(Node *node)
   {
     for (typename VEntry::iterator it = q.front()->children_.begin(); it!=q.front()->children_.end(); ++it)
     {
-      InsertEntry(*it,0);
+      InsertEntry(*it,q.front()->level_);
     }
     q.pop();
-  }/**/
+  }
 
 }
 template<typename T>
@@ -417,12 +417,13 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
         tmp->children_.erase(it);
     }
     CondenseTree(tmp);
+    if(root_->children_.size() == 1) 
+    {
+      root_ = static_cast<Node*>(tmp->children_[0].second);
+      delete(tmp);
+    }
   }
-  if(tmp->children_.size()==1)
-  {
-    root_ = static_cast<Node*>(tmp->children_[0].second);
-    delete(tmp);
-  }
+  
 }
 
 

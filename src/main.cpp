@@ -67,6 +67,8 @@ void Testing() {
   assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 6);
   rtree.Delete(bb3,3);
   assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 5);
+  rtree.Delete(bb2,2);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 4);
   for (size_t i = 0; i < 4000; ++i) {
     RStarTree<>::BoundingBox bb = GetRandomBB();
     rtree.Insert(bb, 8 + i);
