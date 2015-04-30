@@ -140,6 +140,9 @@ void queries_tree (int sock)
 {
    int n,op;
    char buffer[256];
+   std::stringstream join;
+   string msj;
+
    std::vector<size_t> vb;
    RStarTree<> rtree;
    bzero(buffer,256);
@@ -159,7 +162,10 @@ void queries_tree (int sock)
 	{
 		case 0:
   	   		vb = rtree.Intersect({{v[0], v[1]}, {v[2], v[3]}});
-	   		n = write(sock,"find element",18);
+   		    for (auto value: vb)
+		    	join << value <<" ";
+    		msj = join.str().substr(0,join.str().size()-1);
+	   		n = write(sock,msj.c_str(),18);
 	   		if (n < 0) error("ERROR writing to socket");
 	   		break;
 	   	case 1:
