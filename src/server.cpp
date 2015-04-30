@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-void dostuff(int); /* function prototype */
+void dostuff(int); 
 void error(const char *msg)
 {
     perror(msg);
@@ -50,16 +50,12 @@ int main(int argc, char *argv[])
              exit(0);
          }
          else close(newsockfd);
-     } /* end of while */
+     } 
      close(sockfd);
-     return 0; /* we never get here */
+     return 0; 
 }
 
-/******** DOSTUFF() *********************
- There is a separate instance of this function 
- for each connection.  It handles all communication
- once a connnection has been established.
- *****************************************/
+
 void dostuff (int sock)
 {
    int n;
@@ -70,7 +66,7 @@ void dostuff (int sock)
    if (n < 0) error("ERROR reading from socket");
    std::stringstream ss;
    ss<<buffer;
-   double ve[10];
+   double ve[256];
    for (int i = 0; ss!=0; ++i)
    {
      ss>>ve[i];
