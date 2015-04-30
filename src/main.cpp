@@ -60,13 +60,24 @@ void Testing() {
   rtree.Insert({{12, 13}, {12, 13}}, 6);
   rtree.Insert({{15, 16}, {15, 16}}, 7);
 
+
   assert(rtree.Intersect(bb1).size() == 3);
   assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 7);
+  rtree.Delete(bb1,1);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 6);
+  rtree.Delete(bb3,3);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 5);
+  rtree.Delete(bb2,2);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 4);
+  rtree.Delete({{5, 6}, {5, 6}}, 4);
+  assert(rtree.Intersect({{0, 20}, {0, 20}}).size() == 3);
+
   for (size_t i = 0; i < 4000; ++i) {
     RStarTree<>::BoundingBox bb = GetRandomBB();
     rtree.Insert(bb, 8 + i);
     assert(rtree.Intersect(bb).size() != 0);
   }
+
 }
 
 int main() {

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include <functional>
+#include <queue>          
 
 #include "rstartraits.h"
 
@@ -369,5 +370,62 @@ typename RStarTree<T>::Node *RStarTree<T>::FindLeaf(
     return nullptr;
   }
 }
+template<typename T>
+void RStarTree<T>::CondenseTree(Node *node)
+{
+  Node *tmp,*parent;
+  tmp = node;
+  std::queue<Node*> q;
+ 
+  while(tmp != root_)
+  {
+    parent = tmp->parent_;
+    if(tmp->children_.size()<min_node_size_)
+    {
+      typename VEntry::iterator it = FindEntry(parent->children_,tmp);
+      parent->children_.erase(it);
+      q.push(tmp);
+    }
+    else
+    {
+        typename VEntry::iterator it = FindEntry(parent->children_, tmp);
+        it->first = BuildBoundingBox(tmp->children_);
+    }
+    tmp = parent;
+  }
+  while(!q.empty())
+  {
+    for (typename VEntry::iterator it = q.front()->children_.begin(); it!=q.front()->children_.end(); ++it)
+    {
+      InsertEntry(*it,q.front()->level_);
+    }
+    q.pop();
+  }
+
+}
+template<typename T>
+void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
+{
+  Node *tmp;
+  tmp = FindLeaf(bounding_box,record,root_);
+  if(tmp)
+  {
+    for (typename VEntry::iterator it = tmp->children_.begin(); it!=tmp->children_.end(); ++it)
+    {
+      if (bounding_box == it->first and
+          record == *static_cast<RecordType *>(it->second))
+        tmp->children_.erase(it);
+    }
+    CondenseTree(tmp);
+    if(root_->children_.size() == 1) 
+    {
+      root_ = static_cast<Node*>(tmp->children_[0].second);
+      root_->parent_ = nullptr;
+      delete(tmp);
+    }
+  }
+  
+}
+
 
 #endif //RSTARTREE_RSTARTREE_H_
