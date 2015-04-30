@@ -66,12 +66,12 @@ void dostuff (int sock)
    if (n < 0) error("ERROR reading from socket");
    std::stringstream ss;
    ss<<buffer;
-   double ve[256];
+   double ve[7];
    for (int i = 0; ss!=0; ++i)
    {
      ss>>ve[i];
    }
-     
+   //consult_tree(ve[0],ve[1],ve[2],ve[3],ve[4],ve[5]);      
    n = write(sock,"I got your message",18);
    if (n < 0) error("ERROR writing to socket");
 }
