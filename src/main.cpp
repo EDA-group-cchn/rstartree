@@ -88,7 +88,8 @@ void Testing() {
   }
 
 }
-void dostuff(int); 
+void dostuff(int);
+void consult_tree(int,double,double,double,double,double);
 void error(const char *msg)
 {
     perror(msg);
@@ -138,20 +139,40 @@ int main(int argc, char *argv[]) {
 }
 void dostuff (int sock)
 {
-   int n;
+   int n,op;
    char buffer[256];
-      
+   RStarTree<> rtree;
    bzero(buffer,256);
    n = read(sock,buffer,255);
    if (n < 0) error("ERROR reading from socket");
    std::stringstream ss;
    ss<<buffer;
-   double ve[7];
+   ss>>op;
+   double v[5];
    for (int i = 0; ss!=0; ++i)
    {
-     ss>>ve[i];
+     ss>>v[i];
    }
-   //consult_tree(ve[0],ve[1],ve[2],ve[3],ve[4],ve[5]);      
-   n = write(sock,"I got your message",18);
-   if (n < 0) error("ERROR writing to socket");
+   switch(op)
+   {
+   		case 0:
+   			std::cout<<"buscar";
+   		case 1:
+   			rtree.Insert({{v[0], v[1]}, {v[2], v[3]}}, v[4]);
+   			n = write(sock,"element inserted",18);
+   			if (n < 0) error("ERROR writing to socket");
+   			break;
+   		case 2:
+   			rtree.Delete({{v[0], v[1]}, {v[2], v[3]}}, v[4]);
+   			n = write(sock,"element deleted",18);
+   			if (n < 0) error("ERROR writing to socket");
+   			break;
+   		case 3:
+   			std::cout<<"salir";
+   		
+
+
+   }
+   
+   
 }
