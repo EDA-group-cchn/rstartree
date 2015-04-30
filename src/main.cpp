@@ -61,6 +61,10 @@ void Testing() {
   assert(bb2.Overlap(bb3) == 0);
 
   rtree.Insert(bb1, 1);
+  rtree.Delete(bb1, 1);
+  assert(rtree.Intersect(bb1).size() == 0);
+
+  rtree.Insert(bb1, 1);
   rtree.Insert(bb2, 2);
   rtree.Insert(bb3, 3);
 
@@ -86,8 +90,8 @@ void Testing() {
     rtree.Insert(bb, 8 + i);
     assert(rtree.Intersect(bb).size() != 0);
   }
-
 }
+
 void queries_tree(int);
 void error(const char *msg)
 {
@@ -98,90 +102,97 @@ int main(int argc, char *argv[]) {
   Testing();
 
   int sockfd, newsockfd, portno, pid;
-     socklen_t clilen;
-     struct sockaddr_in serv_addr, cli_addr;
+  socklen_t clilen;
+  struct sockaddr_in serv_addr, cli_addr;
 
-     if (argc < 2) {
-         fprintf(stderr,"ERROR, no port provided\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) 
-        error("ERROR opening socket");
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-              sizeof(serv_addr)) < 0) 
-              error("ERROR on binding");
-     listen(sockfd,5);
-     clilen = sizeof(cli_addr);
-     while (1) {
-         newsockfd = accept(sockfd, 
-               (struct sockaddr *) &cli_addr, &clilen);
-         if (newsockfd < 0) 
-             error("ERROR on accept");
-         pid = fork();
-         if (pid < 0)
-             error("ERROR on fork");
-         if (pid == 0)  {
-             close(sockfd);
-             queries_tree(newsockfd);
-             exit(0);
-         }
-         else close(newsockfd);
-     } 
-     close(sockfd);
+  if (argc < 2) {
+    fprintf(stderr,"ERROR, no port provided\n");
+    exit(1);
+  }
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0)
+    error("ERROR opening socket");
+  bzero((char *) &serv_addr, sizeof(serv_addr));
+  portno = atoi(argv[1]);
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_addr.s_addr = INADDR_ANY;
+  serv_addr.sin_port = htons(portno);
+  if (bind(sockfd, (struct sockaddr *) &serv_addr,
+           sizeof(serv_addr)) < 0)
+    error("ERROR on binding");
+  listen(sockfd,5);
+  clilen = sizeof(cli_addr);
+  while (1) {
+    newsockfd = accept(sockfd,
+                       (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0)
+      error("ERROR on accept");
+    pid = fork();
+    if (pid < 0)
+      error("ERROR on fork");
+    if (pid == 0)  {
+      close(sockfd);
+      queries_tree(newsockfd);
+      exit(0);
+    }
+    else close(newsockfd);
+  }
+  close(sockfd);
   return 0;
 }
+
 void queries_tree (int sock)
 {
-   int n,op;
-   size_t val;
-   char buffer[256];
-   std::stringstream join;
-   string msj;
-   std::vector<size_t> vb;
-   RStarTree<> rtree;
-   bzero(buffer,256);
-   
-   while(true)
-   {
-   	n = read(sock,buffer,255);
-	if (n < 0) error("ERROR reading from socket");
-	std::stringstream ss;
-	ss<<buffer;
-	ss>>op;
-	double v[4];
-	for (int i = 0; ss!=0; ++i)
-	{
-	  ss>>v[i];
-	}
-	if(op == 1 || op == 2)
-		ss>>val;
-	switch(op)
-	{
-		case 0:
-  	   		vb = rtree.Intersect({{v[0], v[1]}, {v[2], v[3]}});
-   		    for (auto value: vb)
-		    	join << value <<" ";
-    		msj = join.str().substr(0,join.str().size()-1);
-	   		n = write(sock,msj.c_str(),msj.size()+1);
-	   		break;
-	   	case 1:
-	   		rtree.Insert({{v[0], v[1]}, {v[2], v[3]}}, val);
-	   		n = write(sock,"element inserted",18);
-	   		break;
-	   	case 2:
-	   		rtree.Delete({{v[0], v[1]}, {v[2], v[3]}}, val);
-	   		n = write(sock,"element deleted",18);
-	   		break;
-	   	case 3:
-	   		n = write(sock,"exit",18);
-	   		return;
-	}
-	if (n < 0) error("ERROR writing to socket");
-   }
+  puts("NEW CONNECTION");
+  int n,op;
+  size_t val;
+  char buffer[256];
+  string msj;
+  std::vector<size_t> vb;
+  RStarTree<> rtree;
+  bzero(buffer,256);
+
+  while(true)
+  {
+    n = read(sock,buffer,255);
+    if (n < 0) error("ERROR reading from socket");
+    std::stringstream ss(buffer);
+    ss>>op;
+    double v[4];
+    for (int i = 0; i < 4 and ss!=0; ++i) {
+      ss>>v[i];
+    }
+    if(ss)
+      ss>>val;
+    switch(op)
+    {
+      case 0:
+        vb = rtree.Intersect({{v[0], v[1]}, {v[2], v[3]}});
+        if (vb.size()) {
+          stringstream join;
+          for (auto value: vb)
+            join << value << " ";
+          msj = join.str().substr(0, join.str().size()-1);
+        } else {
+          msj = "No results";
+        }
+        break;
+      case 1:
+        rtree.Insert({{v[0], v[1]}, {v[2], v[3]}}, val);
+        msj = "Element inserted";
+        break;
+      case 2:
+        rtree.Delete({{v[0], v[1]}, {v[2], v[3]}}, val);
+        msj = "Element deleted";
+        break;
+      case 3:
+        msj = "Bye";
+    }
+    n = write(sock,msj.c_str(),msj.size()+1);
+    if (n < 0) error("ERROR writing to socket");
+    if (op == 3) {
+      puts("CONNECTION CLOSING");
+      break;
+    }
+  }
 }
