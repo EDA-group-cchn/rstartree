@@ -10,10 +10,12 @@ std::map<std::string, int> Command::operations_ = {
 std::string Command::String() {
   std::stringstream ss;
   ss << op_code_;
-  if (op_code_ != 3 and op_code_ != -1)
+  if (op_code_ != 3 and op_code_ != -1) {
     ss << ' ' << x1_ << ' ' << x2_ <<
-        ' ' << y1_ << ' ' << y2_ <<
-        ' ' << value_;
+          ' ' << y1_ << ' ' << y2_;
+    if (op_code_ != 0)
+      ss << ' ' << value_;
+  }
   return ss.str();
 }
 
