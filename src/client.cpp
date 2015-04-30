@@ -33,7 +33,6 @@ void test() {
 
 int main(int argc, char *argv[])
 {
-  test();
   int sockfd, portno, n;
   struct sockaddr_in serv_addr;
   struct hostent *server;
