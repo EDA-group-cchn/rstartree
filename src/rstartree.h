@@ -420,6 +420,7 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
     if(root_->children_.size() == 1) 
     {
       root_ = static_cast<Node*>(tmp->children_[0].second);
+      root_->parent_ = nullptr;
       delete(tmp);
     }
   }
