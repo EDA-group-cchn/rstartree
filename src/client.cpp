@@ -74,7 +74,7 @@ void run(int sockfd) {
     Command command = Command::Parse(std::string(buffer));
     if (command.OpCode() != -1) {
       const char *msg = command.String().c_str();
-      n = write(sockfd, msg, strlen(msg));
+      n = write(sockfd, msg, strlen(msg) + 1);
       if (n < 0)
         error("ERROR writing to socket");
       bzero(buffer, 256);
