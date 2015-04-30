@@ -411,11 +411,12 @@ void RStarTree<T>::Delete(const BoundingBox &bounding_box, RecordType record)
   if(tmp)
   {
     for (typename VEntry::iterator it = tmp->children_.begin(); it!=tmp->children_.end(); ++it)
-    {
       if (bounding_box == it->first and
-          record == *static_cast<RecordType *>(it->second))
+          record == *static_cast<RecordType *>(it->second)) {
+        delete static_cast<RecordType *>(it->second);
         tmp->children_.erase(it);
-    }
+        break;
+      }
     CondenseTree(tmp);
     if(root_->children_.size() == 1) 
     {
