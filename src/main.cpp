@@ -139,13 +139,14 @@ int main(int argc, char *argv[]) {
 void queries_tree (int sock)
 {
    int n,op;
+   size_t val;
    char buffer[256];
    std::stringstream join;
    string msj;
-
    std::vector<size_t> vb;
    RStarTree<> rtree;
    bzero(buffer,256);
+   
    while(true)
    {
    	n = read(sock,buffer,255);
@@ -153,11 +154,13 @@ void queries_tree (int sock)
 	std::stringstream ss;
 	ss<<buffer;
 	ss>>op;
-	double v[5];
+	double v[4];
 	for (int i = 0; ss!=0; ++i)
 	{
 	  ss>>v[i];
 	}
+	if(op == 1 || op == 2)
+		ss>>val;
 	switch(op)
 	{
 		case 0:
@@ -165,23 +168,20 @@ void queries_tree (int sock)
    		    for (auto value: vb)
 		    	join << value <<" ";
     		msj = join.str().substr(0,join.str().size()-1);
-	   		n = write(sock,msj.c_str(),18);
-	   		if (n < 0) error("ERROR writing to socket");
+	   		n = write(sock,msj.c_str(),msj.size()+1);
 	   		break;
 	   	case 1:
-	   		rtree.Insert({{v[0], v[1]}, {v[2], v[3]}}, v[4]);
+	   		rtree.Insert({{v[0], v[1]}, {v[2], v[3]}}, val);
 	   		n = write(sock,"element inserted",18);
-	   		if (n < 0) error("ERROR writing to socket");
 	   		break;
 	   	case 2:
-	   		rtree.Delete({{v[0], v[1]}, {v[2], v[3]}}, v[4]);
+	   		rtree.Delete({{v[0], v[1]}, {v[2], v[3]}}, val);
 	   		n = write(sock,"element deleted",18);
-	   		if (n < 0) error("ERROR writing to socket");
 	   		break;
 	   	case 3:
 	   		n = write(sock,"exit",18);
-	   		if (n < 0) error("ERROR writing to socket");
 	   		return;
-	   }
+	}
+	if (n < 0) error("ERROR writing to socket");
    }
 }
